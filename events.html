@@ -1,0 +1,69 @@
+
+{% extends "base.html" %}
+{% block title %}Explore Events | EventEase{% endblock %}
+
+{% block content %}
+<section class="page-heading">
+    <span class="eyebrow">FIND YOUR EXPERIENCE</span>
+    <h1>Explore Events</h1>
+    <p class="muted">Choose an event and reserve your tickets.</p>
+</section>
+
+<form class="filter-form" action="{{ url_for('events_page') }}" method="GET">
+    <input type="search" name="search"
+           placeholder="Search event or venue..."
+           value="{{ search }}">
+
+    <select name="category">
+        <option value="">All Categories</option>
+        {% for item in categories %}
+        <option value="{{ item.category }}"
+            {% if selected_category == item.category %}selected{% endif %}>
+            {{ item.category }}
+        </option>
+        {% endfor %}
+    </select>
+
+    <button class="btn" type="submit">Search</button>
+    <a class="btn secondary" href="{{ url_for('events_page') }}">Reset</a>
+</form>
+
+<div class="event-grid">
+    {% for event in events %}
+    <article class="event-card">
+        {% if event.image %}
+        <img class="event-image" src="{{ event.image }}"
+             alt="{{ event.title }}" loading="lazy">
+        {% else %}
+        <div class="event-image image-placeholder">EVENT</div>
+        {% endif %}
+
+        <div class="event-body">
+            <span class="tag">{{ event.category }}</span>
+            <h3>{{ event.title }}</h3>
+            <p>📍 {{ event.venue }}</p>
+            <p>📅 {{ event.event_date }}</p>
+            <p>
+                {% if event.available_tickets > 0 %}
+                    {{ event.available_tickets }} tickets available
+                {% else %}
+                    Sold out
+                {% endif %}
+            </p>
+            <div class="card-bottom">
+                <strong>₹{{ "%.2f"|format(event.price) }}</strong>
+                <a class="btn small"
+                   href="{{ url_for('event_details', event_id=event.id) }}">
+                    View Details
+                </a>
+            </div>
+        </div>
+    </article>
+    {% else %}
+    <div class="empty-state">
+        <h3>No matching events found</h3>
+        <p>Try a different search term or category.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

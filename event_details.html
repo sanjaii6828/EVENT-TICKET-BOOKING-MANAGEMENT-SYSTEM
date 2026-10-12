@@ -1,0 +1,80 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="event-details">
+
+    <div class="event-header">
+        <h1>{{ event.title }}</h1>
+        <p>Discover the event and book your tickets!</p>
+    </div>
+
+    <div class="event-info">
+
+        {% if event.image %}
+        <img
+            src="{{ event.image }}"
+            alt="{{ event.title }}"
+            class="event-image"
+        >
+        {% endif %}
+
+        <div class="event-content">
+
+            <h2>Event Information</h2>
+
+            <p>
+                <strong>Category:</strong>
+                {{ event.category }}
+            </p>
+
+            <p>
+                <strong>Date:</strong>
+                {{ event.event_date }}
+            </p>
+
+            <p>
+                <strong>Venue:</strong>
+                {{ event.venue }}
+            </p>
+
+            <p>
+                <strong>Ticket Price:</strong>
+                ₹{{ "%.2f"|format(event.price) }}
+            </p>
+
+            <p>
+                <strong>Available Tickets:</strong>
+                {{ event.available_tickets }}
+            </p>
+
+            <h3>Description</h3>
+            <p>{{ event.description }}</p>
+
+            {% if event.event_date >= now_date|default("0000-00-00") and event.available_tickets > 0 %}
+                <a
+                    href="{{ url_for('book_event', event_id=event.id) }}"
+                    class="btn"
+                >
+                    Book Tickets
+                </a>
+            {% else %}
+                <p class="message">
+                    Tickets are unavailable or this event has ended.
+                </p>
+            {% endif %}
+
+            <a
+                href="{{ url_for('events_page') }}"
+                class="btn btn-secondary"
+            >
+                Back to Events
+            </a>
+
+        </div>
+    </div>
+
+</section>
+
+{% endblock %}

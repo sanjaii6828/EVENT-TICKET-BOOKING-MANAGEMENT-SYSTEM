@@ -1,0 +1,79 @@
+
+{% extends "base.html" %}
+{% block title %}My Bookings | EventEase{% endblock %}
+
+{% block content %}
+<section class="page-heading">
+    <span class="eyebrow">YOUR RESERVATIONS</span>
+    <h1>My Bookings</h1>
+    <p class="muted">Enter your booking email to find your reservations.</p>
+</section>
+
+<form class="filter-form" method="GET"
+      action="{{ url_for('my_bookings') }}">
+    <input type="email" name="email" value="{{ email }}"
+           placeholder="Enter your booking email" required>
+    <button class="btn" type="submit">Find Bookings</button>
+</form>
+
+{% if email %}
+    {% if bookings %}
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Booking ID</th>
+                        <th>Event</th>
+                        <th>Date</th>
+                        <th>Tickets</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in bookings %}
+                    <tr>
+                        <td>
+                            <a href="{{ url_for('confirmation',
+                                booking_id=booking.booking_id) }}">
+                                {{ booking.booking_id }}
+                            </a>
+                        </td>
+                        <td>{{ booking.title }}</td>
+                        <td>{{ booking.event_date }}</td>
+                        <td>{{ booking.quantity }}</td>
+                        <td>₹{{ "%.2f"|format(booking.total_price) }}</td>
+                        <td>
+                            <span class="status {{ booking.status|lower }}">
+                                {{ booking.status }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if booking.status == "Confirmed"
+                                  and booking.event_date >=
+                                  now_date|default("0000-00-00") %}
+                            <form method="POST"
+                                  action="{{ url_for('cancel_booking',
+                                  booking_id=booking.booking_id) }}"
+                                  data-confirm="Cancel this booking?">
+                                <input type="hidden" name="email"
+                                       value="{{ email }}">
+                                <button class="btn danger small"
+                                        type="submit">Cancel</button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <h3>No bookings found</h3>
+            <p>Check your email address and try again.</p>
+        </div>
+    {% endif %}
+{% endif %}
+{% endblock %}

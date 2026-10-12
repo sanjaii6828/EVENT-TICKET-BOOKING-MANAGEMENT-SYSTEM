@@ -1,0 +1,156 @@
+
+{% extends "base.html" %}
+{% block title %}Admin Dashboard | EventEase{% endblock %}
+
+{% block content %}
+<section class="page-heading">
+    <span class="eyebrow">MANAGEMENT CONSOLE</span>
+    <h1>Admin Dashboard</h1>
+    <p class="muted">Manage events and monitor bookings.</p>
+</section>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <span>Total Events</span>
+        <strong>{{ events|length }}</strong>
+    </div>
+    <div class="stat-card">
+        <span>Confirmed Bookings</span>
+        <strong>{{ total_bookings }}</strong>
+    </div>
+    <div class="stat-card">
+        <span>Confirmed Booking Value</span>
+        <strong>₹{{ "%.2f"|format(total_revenue) }}</strong>
+    </div>
+</div>
+
+<section class="admin-panel">
+    <h2>Add New Event</h2>
+    <form class="admin-form" method="POST" action="{{ url_for('admin') }}">
+        <input type="hidden" name="action" value="add_event">
+
+        <label>Event Name
+            <input name="title" required maxlength="120">
+        </label>
+
+        <label>Category
+            <select name="category" required>
+                <option value="">Select category</option>
+                <option>Music</option>
+                <option>Technology</option>
+                <option>Education</option>
+                <option>Comedy</option>
+                <option>Workshop</option>
+                <option>Business</option>
+                <option>Other</option>
+            </select>
+        </label>
+
+        <label>Venue
+            <input name="venue" required maxlength="150">
+        </label>
+
+        <label>Event Date
+            <input type="date" name="event_date" required
+                   min="{{ today }}">
+        </label>
+
+        <label>Ticket Price (₹)
+            <input type="number" name="price" min="0"
+                   max="10000000" step="0.01" required>
+        </label>
+
+        <label>Available Tickets
+            <input type="number" name="available_tickets" min="0"
+                   max="1000000" required>
+        </label>
+
+        <label class="full-field">Image URL (optional)
+            <input type="url" name="image" maxlength="500"
+                   placeholder="https://example.com/event.jpg">
+        </label>
+
+        <label class="full-field">Description
+            <textarea name="description" rows="3"
+                      maxlength="2000" required></textarea>
+        </label>
+
+        <button class="btn full-field" type="submit">Add Event</button>
+    </form>
+</section>
+
+<section class="admin-panel">
+    <h2>Manage Events</h2>
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Event</th>
+                    <th>Date</th>
+                    <th>Price</th>
+                    <th>Available</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for event in events %}
+                <tr>
+                    <td>{{ event.title }}</td>
+                    <td>{{ event.event_date }}</td>
+                    <td>₹{{ "%.2f"|format(event.price) }}</td>
+                    <td>{{ event.available_tickets }}</td>
+                    <td>
+                        <form method="POST" action="{{ url_for('admin') }}"
+                              data-confirm="Delete this event?">
+                            <input type="hidden" name="action" value="delete_event">
+                            <input type="hidden" name="event_id"
+                                   value="{{ event.id }}">
+                            <button class="btn danger small" type="submit">
+                                Delete
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="admin-panel">
+    <h2>Recent Bookings</h2>
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Booking ID</th>
+                    <th>Customer</th>
+                    <th>Event</th>
+                    <th>Tickets</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings %}
+                <tr>
+                    <td>{{ booking.booking_id }}</td>
+                    <td>{{ booking.customer_name }}</td>
+                    <td>{{ booking.title }}</td>
+                    <td>{{ booking.quantity }}</td>
+                    <td>₹{{ "%.2f"|format(booking.total_price) }}</td>
+                    <td>{{ booking.status }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="6">No bookings yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<p class="notice error">
+    Demo only: this admin page has no login protection. Do not deploy it
+    publicly until authentication and authorization are implemented.
+</p>
+{% endblock %}

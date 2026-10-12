@@ -1,0 +1,52 @@
+
+{% extends "base.html" %}
+{% block title %}Booking Confirmation | EventEase{% endblock %}
+
+{% block content %}
+<section class="confirmation-card">
+    <div class="success-icon">✓</div>
+    <span class="eyebrow">BOOKING RESULT</span>
+
+    {% if booking.status == "Confirmed" %}
+        <h1>Booking Confirmed!</h1>
+        <p>Your tickets have been reserved successfully.</p>
+    {% else %}
+        <h1>Booking Cancelled</h1>
+        <p>This booking is no longer active.</p>
+    {% endif %}
+
+    <div class="booking-code">
+        <span>BOOKING REFERENCE</span>
+        <strong>{{ booking.booking_id }}</strong>
+        <button class="btn secondary small"
+                type="button"
+                data-copy="{{ booking.booking_id }}">
+            Copy ID
+        </button>
+    </div>
+
+    <div class="receipt">
+        <div><span>Event</span><strong>{{ booking.title }}</strong></div>
+        <div><span>Venue</span><strong>{{ booking.venue }}</strong></div>
+        <div><span>Date</span><strong>{{ booking.event_date }}</strong></div>
+        <div><span>Customer</span><strong>{{ booking.customer_name }}</strong></div>
+        <div><span>Email</span><strong>{{ booking.email }}</strong></div>
+        <div><span>Tickets</span><strong>{{ booking.quantity }}</strong></div>
+        <div><span>Total Amount</span>
+            <strong>₹{{ "%.2f"|format(booking.total_price) }}</strong>
+        </div>
+        <div><span>Status</span><strong>{{ booking.status }}</strong></div>
+    </div>
+
+    <p class="muted small-text">
+        This is a digital booking confirmation for the project demo,
+        not a payment receipt.
+    </p>
+
+    <div class="button-row">
+        <button class="btn secondary" type="button"
+                onclick="window.print()">Print</button>
+        <a class="btn" href="{{ url_for('events_page') }}">Explore More Events</a>
+    </div>
+</section>
+{% endblock %}
